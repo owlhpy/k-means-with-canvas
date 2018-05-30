@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>k-means过程分析</title>
+</head>
+<body>
+	<div style="position: relative;margin: 0 auto;">
+		<canvas id="canvas" width="600px" height="500px">
+			
+		</canvas>
+		<button id="button3">
+			初始化中心
+		</button>
+		<button id="button1">
+			计算距离划分类
+		</button>
+		<button id="button2">
+			重新获得中心
+		</button>
+		
+		<div id="result">
+			
+		</div>
+	</div>
+	<script type="text/javascript">
+		window.onload = function(){
+			var OC = document.getElementById('canvas');
+			var OGC = OC.getContext('2d');
+			var result = document.getElementById('result');
+
+			var coordinate = [
+			{
+				x:50,
+				y:200,
+				own:1
+			},
+			{
+				x:80,
+				y:300,
+				own:1
+			},
+			{
+				x:120,
+				y:60,
+				own:1
+			},
+			{
+				x:160,
+				y:220,
+				own:1
+			},
+			{
+				x:240,
+				y:360,
+				own:1
+			},
+			{
+				x:250,
+				y:280,
+				own:1
+			},
+			{
+				x:220,
+				y:180,
+				own:1
+			},
+			{
+				x:300,
+				y:250,
+				own:1
+			},
+			{
+				x:280,
+				y:160,
+				own:1
+			},
+			{
+				x:400,
+				y:100,
+				own:1
+			}
+			];
+
+			var centres = [
+			{
+				x:220,
+				y:180,
+				own:1
+			},
+			{
+				x:280,
+				y:160,
+				own:2
+			}
+			];
+			
+            
+            result.innerHTML = result.innerHTML = `中心点坐标：红色：${centres[0].x}，${centres[0].y}和蓝色：${centres[1].x}，${centres[1].y}`;
+            function initcenter(middle)
+            {
+            	for(let i = 0;i<middle.length;i++)
+				{
+					if(middle[i].own===1)
+					{
+						drawcircle(middle[i].x,middle[i].y,13,0,360,'red','fill',i);
+					}else{
+						drawcircle(middle[i].x,middle[i].y,13,0,360,'blue','fill',i);
+					}
+					
+				}
+            }
+			function show(coord,middle){
+				console.log(coord.length);
+				for(let i = 0;i<coord.length;i++)
+				{
+
+					drawcircle(coord[i].x,coord[i].y,13,0,360,'black','stroke',i);
+				}
+				
+
+			}
+			function show2(coord,middle){
+				console.log(coord.length);
+				OGC.clearRect(0,0,OC.width,OC.height);
+				for(let i= 0;i<coord.length;i++)
+				{
+					if(coord[i].own===1){
+						drawcircle(coord[i].x,coord[i].y,13,0,360,'red','stroke',i);
+					}else{
+						drawcircle(coord[i].x,coord[i].y,13,0,360,'blue','stroke',i);
+					}
+                    
+                    
+					
+				}
+				for(let i = 0;i<middle.length;i++)
+				{
+					if(middle[i].own===1)
+					{
+						drawcircle(middle[i].x,middle[i].y,13,0,360,'red','fill',i);
+					}else if(middle[i].own===2){
+						drawcircle(middle[i].x,middle[i].y,13,0,360,'blue','fill',i);
+					}
+					
+				}
+
+			}
+            show(coordinate,centres);
+
+            function countdis(coord,middle){
+            	var disA ,disB;
+            	for(let i =0;i<coord.length;i++)
+            	{
+            		disA = Math.floor(Math.sqrt(Math.pow(coord[i].x-middle[0].x,2)+Math.pow(coord[i].y-middle[0].y, 2)));
+            		// console.log(disA);
+            		disB = Math.floor(Math.sqrt(Math.pow(coord[i].x-middle[1].x,2)+Math.pow(coord[i].y-middle[1].y, 2)));
+            		// console.log(disB);
+            		if(disA>disB)
+            		{
+            			coordinate[i].own = 2;
+            			console.log(coordinate[i].own);
+            		}
+            	}
+
+            	
+            }
+            
+			function getNewCenter(coord){
+				var A = coord.filter(function(item){
+            		return item.own===1?true:false
+            	});
+            	var B = coord.filter(function(item){
+            		return item.own===2?true:false
+            	});
+            	console.log(A);
+            	console.log(B);
+            	var x1=0,y1=0,x2=0,y2=0;
+            	for(let i =0;i<A.length;i++)
+            	{
+            		x1+=A[i].x;
+            		y1 += A[i].y;
+            	}
+            	for(let i =0;i<B.length;i++)
+            	{
+            		x2+=B[i].x;
+            		y2 += B[i].y;
+            	}
+            	
+
+            	centres[0].x = x1/A.length;
+            	centres[0].y = y1/A.length;
+            	centres[1].x =x2/B.length;
+            	centres[1].y =y2/B.length;
+
+            	
+            	console.log('ok');
+            	var result = document.getElementById('result');
+
+                result.innerHTML = `中心点坐标：红色：${centres[0].x}，${centres[0].y}和蓝色：${centres[1].x}，${centres[1].y}`;
+			}
+			function drawcircle(x,y,r,start=0,end=360,color='black',type,i){
+				var unit = Math.PI / 180;
+				OGC.beginPath();
+				OGC.arc(x, y, r, start * unit, end * unit);
+				OGC.fillText('A'+i,x-5,y+2);
+				OGC[type + 'Style'] = color;
+				OGC.closePath();
+				OGC[type]();
+
+			}
+			
+			var button1 = document.getElementById('button1');
+			var button2 = document.getElementById('button2');
+			var button3 = document.getElementById('button3');
+			button1.onclick = function(){
+				
+				countdis(coordinate,centres);
+				show2(coordinate,centres);
+			}
+			button2.onclick= function(){
+				getNewCenter(coordinate);
+			}
+			button3.onclick = function(){
+                initcenter(centres);
+                this.style.display = 'none';
+			}
+		}
+	</script>
+</body>
+</html>
