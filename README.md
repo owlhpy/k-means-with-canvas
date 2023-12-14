@@ -10,4 +10,3 @@
 
 重复2、3步，直到中心点不再发生变化，聚类完成
 
-[点击这里在线查看](http://hpyan.dev.dxdc.net/kmeans.html) 
